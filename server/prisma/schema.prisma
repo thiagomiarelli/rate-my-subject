@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// npx prisma migrate dev
+// npx prisma generate
+// (abrir arquivo node_modules/.prisma/client/index.d.ts)
+
+model Student {
+  id         String   @id @default(uuid())
+  name       String
+  course     String
+  university String
+  term       String
+  email      String   @unique
+  password   String
+  created_at DateTime @default(now())
+
+  evaluationsGiven Evaluation[]
+
+  @@map("students")
+}
+
+model Subject {
+  id         String @id @default(uuid())
+  name       String @unique
+  syllabus   String
+  department String
+  workload   Int
+  code       String
+
+  //? Calculations
+  rating_sum     Int @default(0)
+  rating_cnt     Int @default(0)
+  difficulty_sum Int @default(0)
+  difficulty_cnt Int @default(0)
+  recommend_sum  Int @default(0)
+  recommend_cnt  Int @default(0)
+
+  created_at DateTime @default(now())
+
+  evaluations Evaluation[]
+  professors  Professor[]
+
+  @@map("subjects")
+}
+
+model Professor {
+  id         String   @id @default(uuid())
+  name       String
+  university String
+  created_at DateTime @default(now())
+
+  //? Calculations
+  rating_sum Int @default(0)
+  rating_cnt Int @default(0)
+
+  subjects             Subject[]
+  evaluations_received Evaluation[]
+
+  @@map("professors")
+}
+
+model Evaluation {
+  id                String   @id @default(uuid())
+  rating            Int
+  difficulty        Int
+  recommended       Boolean
+  evaluation_method String
+  comment           String
+  created_at        DateTime @default(now())
+
+  student_rel   Student   @relation(fields: [student], references: [id], onDelete: Cascade)
+  student       String
+  professor_rel Professor @relation(fields: [professor], references: [id], onDelete: Cascade)
+  professor     String
+  subject_rel   Subject   @relation(fields: [subject], references: [id], onDelete: Cascade)
+  subject       String
+
+  @@map("evaluations")
+}

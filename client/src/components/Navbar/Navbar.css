@@ -1,0 +1,11 @@
+.Navbar {
+    height: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+.navbar-elements {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
